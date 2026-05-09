@@ -53,8 +53,10 @@ example (a b c d : ℝ) (hyp : c = b * a - d) (hyp' : d = a * b) : c = 0 := by
   rw [hyp']
   rw [sub_self]
 
-example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) : a * (b * e) = c * (d * f) := by
-  rw [h', ← mul_assoc, h, mul_assoc]
+#check sub_self
+
+example (a b c d e f : ℝ) (h : c * d = a * b) (h' : e = f) : a * (b * e) = c * (d * f) := by
+  rw [h', ← mul_assoc, ← h, mul_assoc]
 
 section
 
@@ -76,6 +78,12 @@ variable (a b c : ℝ)
 #check mul_assoc c a b
 #check mul_comm a
 #check mul_comm
+#check mul_add a b c
+#check two_mul a
+#check add_mul a b c
+#check add_assoc a b c
+#check add_comm a b
+#check sub_self a
 
 end
 
@@ -98,12 +106,16 @@ example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
 
 example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b :=
   calc
-    (a + b) * (a + b) = a * a + b * a + (a * b + b * b) := by
-      sorry
-    _ = a * a + (b * a + a * b) + b * b := by
-      sorry
+    (a + b) * (a + b) = a * (a + b) + b * (a + b) := by
+      rw [add_mul]
+    _ = (a * a + a * b) + (b * a + b * b):= by
+      rw [mul_add, mul_add]
+    _ = a * a + (a * b + b * a) + b * b := by
+      rw [← add_assoc, add_assoc (a * a)]
+    _ = a * a + (a * b + a * b) + b * b := by
+      rw [mul_comm b  a]
     _ = a * a + 2 * (a * b) + b * b := by
-      sorry
+      rw [← two_mul]
 
 end
 
@@ -111,11 +123,44 @@ end
 section
 variable (a b c d : ℝ)
 
-example : (a + b) * (c + d) = a * c + a * d + b * c + b * d := by
-  sorry
+example : (a + b) * (c + d) = a * c + a * d + b * c + b * d :=
+  calc
+    (a + b) * (c + d) = a * (c + d) + b * (c + d) := by
+      rw [add_mul]
+    _ = (a * c + a * d) + (b * c + b * d) := by
+      rw [mul_add, mul_add]
+    _ = a * c + a * d + b * c + b * d := by
+      rw [← add_assoc]
 
-example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
-  sorry
+example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 :=
+  calc
+    (a + b) * (a - b) = a * (a - b) + b * (a - b) := by
+      sorry
+    _ = (a * a - a * b) + (b * a - b * b) := by
+      sorry
+    _ = (a * a - a * b) + b * a - b * b := by
+      sorry
+    _ = b * a + (a * a - a * b) - b * b := by
+      sorry
+    _ = b * a + a * a - a * b - b * b := by
+      sorry
+    _ = a * a + b * a - a * b - b * b := by
+      sorry
+    _ = a * a + (b * a - a * b) - b * b := by
+      sorry
+    _ = a * a + (a * b - a * b) - b * b := by
+      sorry
+    _ = a * a + 0 - b * b := by
+      sorry
+    _ = a * a - b * b := by
+      sorry
+    _ = a^2 - b^2 := by
+      sorry
+
+
+
+
+
 
 #check pow_two a
 #check mul_sub a b c
