@@ -104,9 +104,24 @@ example (h₀ : a ≤ b) (h₁ : c < d) : a + exp c + e < b + exp d + e := by
     apply exp_lt_exp.mpr h₁
   apply le_refl
 
-example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by sorry
+example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by
+  have h₁ : a + d ≤ a + e := by
+    apply add_le_add_left h₀
+  have h₂ : exp (a + d) ≤ exp (a + e) := by
+    apply exp_le_exp.mpr h₁
+  apply add_le_add_left h₂
 
-example : (0 : ℝ) < 1 := by norm_num
+example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) :=
+  add_le_add_left (exp_le_exp.mpr (add_le_add_left h₀ a)) c
+
+
+
+
+
+
+
+example : (0 : ℝ) < 1 := by
+  norm_num
 
 example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
   have h₀ : 0 < 1 + exp a := by sorry
