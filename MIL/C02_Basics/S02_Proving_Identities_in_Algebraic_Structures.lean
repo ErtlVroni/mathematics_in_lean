@@ -15,17 +15,21 @@ variable (R : Type*) [Ring R]
 #check (mul_add : ∀ a b c : R, a * (b + c) = a * b + a * c)
 #check (add_mul : ∀ a b c : R, (a + b) * c = a * c + b * c)
 
+
 end
 
 section
 variable (R : Type*) [CommRing R]
 variable (a b c d : R)
 
-example : c * b * a = b * (a * c) := by ring
+example : c * b * a = b * (a * c) := by
+  ring
 
-example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by ring
+example : (a + b) * (a + b) = a * a + 2 * (a * b) + b * b := by
+  ring
 
-example : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by ring
+example : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
+  ring
 
 example (hyp : c = d * a + b) (hyp' : b = a * d) : c = 2 * a * d := by
   rw [hyp, hyp']
@@ -36,12 +40,15 @@ end
 namespace MyRing
 variable {R : Type*} [Ring R]
 
-theorem add_zero (a : R) : a + 0 = a := by rw [add_comm, zero_add]
+theorem add_zero (a : R) : a + 0 = a := by
+  rw [add_comm, zero_add]
 
-theorem add_neg_cancel (a : R) : a + -a = 0 := by rw [add_comm, neg_add_cancel]
+theorem add_neg_cancel (a : R) : a + -a = 0 := by
+  rw [add_comm, neg_add_cancel]
 
 #check MyRing.add_zero
 #check add_zero
+
 
 end MyRing
 
@@ -53,13 +60,29 @@ theorem neg_add_cancel_left (a b : R) : -a + (a + b) = b := by
 
 -- Prove these:
 theorem add_neg_cancel_right (a b : R) : a + b + -b = a := by
-  sorry
+  rw [add_assoc]
+  rw [add_neg_cancel]
+  rw [add_zero]
+
 
 theorem add_left_cancel {a b c : R} (h : a + b = a + c) : b = c := by
-  sorry
+  rw [← zero_add b]
+  rw [← neg_add_cancel a]
+  rw [add_assoc]
+  rw [h]
+  rw [← add_assoc]
+  rw [neg_add_cancel a]
+  rw [zero_add c]
+
 
 theorem add_right_cancel {a b c : R} (h : a + b = c + b) : a = c := by
-  sorry
+  rw [← add_zero a]
+  rw [← add_neg_cancel b]
+  rw [← add_assoc]
+  rw [h]
+  rw [add_assoc]
+  rw [add_neg_cancel b]
+  rw [add_zero c]
 
 theorem mul_zero (a : R) : a * 0 = 0 := by
   have h : a * 0 + a * 0 = a * 0 + 0 := by
@@ -67,20 +90,46 @@ theorem mul_zero (a : R) : a * 0 = 0 := by
   rw [add_left_cancel h]
 
 theorem zero_mul (a : R) : 0 * a = 0 := by
-  sorry
+  have h : 0 * a + 0 * a = 0 * a + 0 := by
+    rw [← add_mul]
+    rw [add_zero]
+    rw [add_zero]
+  rw [add_left_cancel h]
+
 
 theorem neg_eq_of_add_eq_zero {a b : R} (h : a + b = 0) : -a = b := by
-  sorry
+  have h1 : a + -a = a + b := by
+    rw [add_neg_cancel]
+    rw [h]
+  rw [add_left_cancel h1]
+
 
 theorem eq_neg_of_add_eq_zero {a b : R} (h : a + b = 0) : a = -b := by
-  sorry
+  have h1 : a + b = -b + b := by
+    rw [h]
+    rw [neg_add_cancel]
+  rw [add_right_cancel h1]
+
 
 theorem neg_zero : (-0 : R) = 0 := by
   apply neg_eq_of_add_eq_zero
   rw [add_zero]
 
 theorem neg_neg (a : R) : - -a = a := by
-  sorry
+  apply neg_eq_of_add_eq_zero
+  rw [neg_add_cancel]
+
+theorem neg_neg1 (a : R) : - -a = a := by
+  have h : -a + a = 0 := by
+    rw [neg_add_cancel]
+  rw [neg_eq_of_add_eq_zero h]
+
+theorem neg_neg2 (a : R) : - -a = a := by
+  rw [← add_zero (- -a)]
+  rw [← neg_add_cancel a]
+  rw [← add_assoc]
+  rw [neg_add_cancel]
+  rw [zero_add]
 
 end MyRing
 
@@ -103,44 +152,86 @@ namespace MyRing
 variable {R : Type*} [Ring R]
 
 theorem self_sub (a : R) : a - a = 0 := by
-  sorry
+  rw [sub_eq_add_neg a a]
+  rw [add_comm a (-a)]
+  rw [neg_add_cancel a]
+
+theorem self_sub_real (a : ℝ) : a - a = 0 := by
+  apply add_neg_cancel
+
+theorem self_sub_real1 (a : ℝ) : a - a = 0 := by
+  exact add_neg_cancel a
 
 theorem one_add_one_eq_two : 1 + 1 = (2 : R) := by
   norm_num
 
 theorem two_mul (a : R) : 2 * a = a + a := by
-  sorry
+  rw [← one_add_one_eq_two]
+  rw [add_mul]
+  rw [one_mul]
 
 end MyRing
 
 section
 variable (A : Type*) [AddGroup A]
+variable (B : Type*) [AddCommGroup B]
 
 #check (add_assoc : ∀ a b c : A, a + b + c = a + (b + c))
 #check (zero_add : ∀ a : A, 0 + a = a)
 #check (neg_add_cancel : ∀ a : A, -a + a = 0)
+#check (add_comm : ∀ a b : B, a + b = b + a)
 
 end
 
 section
 variable {G : Type*} [Group G]
+variable {H : Type*} [CommGroup H]
 
 #check (mul_assoc : ∀ a b c : G, a * b * c = a * (b * c))
 #check (one_mul : ∀ a : G, 1 * a = a)
 #check (inv_mul_cancel : ∀ a : G, a⁻¹ * a = 1)
+#check (mul_comm : ∀ a b : H, a * b = b * a)
+
 
 namespace MyGroup
 
 theorem mul_inv_cancel (a : G) : a * a⁻¹ = 1 := by
-  sorry
+  have h : (a * a⁻¹)⁻¹ * (a * a⁻¹ * (a * a⁻¹)) = 1 := by
+    rw [mul_assoc]
+    rw [← mul_assoc a⁻¹ a a⁻¹]
+    rw [inv_mul_cancel]
+    rw [one_mul]
+    rw [inv_mul_cancel]
+  rw [← mul_assoc] at h
+  rw [inv_mul_cancel] at h
+  rw [one_mul] at h
+  exact h
+
+
 
 theorem mul_one (a : G) : a * 1 = a := by
-  sorry
+  rw [← inv_mul_cancel a]
+  rw [← mul_assoc]
+  rw [mul_inv_cancel]
+  rw [one_mul]
 
 theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
-  sorry
+  have h : (b⁻¹ * a⁻¹) * (a * b) = 1 := by
+    rw [mul_assoc]
+    rw [← mul_assoc a⁻¹ a b]
+    rw [inv_mul_cancel a]
+    rw [one_mul]
+    rw [inv_mul_cancel]
+  have h1 : (b⁻¹ * a⁻¹) * (a * b) * (a * b)⁻¹ = b⁻¹ * a⁻¹ := by
+    rw [mul_assoc]
+    rw [mul_inv_cancel (a * b)]
+    rw [mul_one]
+  rw [h] at h1
+  rw [one_mul] at h1
+  exact h1
+
+
 
 end MyGroup
 
 end
-

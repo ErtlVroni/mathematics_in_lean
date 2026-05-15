@@ -25,7 +25,7 @@ example (x y z : ℝ) (h₀ : x ≤ y) (h₁ : y ≤ z) : x ≤ z := by
 
 example (x y z : ℝ) (h₀ : x ≤ y) (h₁ : y ≤ z) : x ≤ z := by
   apply le_trans h₀
-  apply h₁
+  · apply h₁
 
 example (x y z : ℝ) (h₀ : x ≤ y) (h₁ : y ≤ z) : x ≤ z :=
   le_trans h₀ h₁
@@ -44,7 +44,25 @@ example (x : ℝ) : x ≤ x :=
 
 -- Try this.
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
-  sorry
+  have h : a < c :=
+    lt_of_le_of_lt h₀ h₁
+  have h' : a < d :=
+    lt_of_lt_of_le h h₂
+  apply lt_trans h' h₃
+
+ example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
+  apply lt_trans
+  · apply lt_of_lt_of_le
+    · apply lt_of_le_of_lt
+      · apply h₀
+      · apply h₁
+    · apply h₂
+  · apply h₃
+
+ example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e :=
+  lt_trans (lt_of_lt_of_le (lt_of_le_of_lt h₀ h₁) h₂) h₃
+
+
 
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d) (h₃ : d < e) : a < e := by
   linarith
@@ -124,4 +142,3 @@ example : |a*b| ≤ (a^2 + b^2)/2 := by
   sorry
 
 #check abs_le'.mpr
-

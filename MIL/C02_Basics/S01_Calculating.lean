@@ -135,32 +135,40 @@ example : (a + b) * (c + d) = a * c + a * d + b * c + b * d :=
 example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 :=
   calc
     (a + b) * (a - b) = a * (a - b) + b * (a - b) := by
-      sorry
+      rw [add_mul]
     _ = (a * a - a * b) + (b * a - b * b) := by
-      sorry
+      rw [mul_sub, mul_sub]
     _ = (a * a - a * b) + b * a - b * b := by
-      sorry
+      rw [add_sub]
     _ = b * a + (a * a - a * b) - b * b := by
-      sorry
+      rw [add_comm]
     _ = b * a + a * a - a * b - b * b := by
-      sorry
+      rw [add_sub]
     _ = a * a + b * a - a * b - b * b := by
-      sorry
+      rw [add_comm]
     _ = a * a + (b * a - a * b) - b * b := by
-      sorry
+      rw [← add_sub]
     _ = a * a + (a * b - a * b) - b * b := by
-      sorry
+      rw [mul_comm b a]
     _ = a * a + 0 - b * b := by
-      sorry
+      rw [sub_self]
     _ = a * a - b * b := by
-      sorry
+      rw [add_zero]
     _ = a^2 - b^2 := by
-      sorry
+      rw [← pow_two, ← pow_two]
 
-
-
-
-
+example (a b : ℝ) : (a + b) * (a - b) = a ^ 2 - b ^ 2 := by
+  rw [add_mul]
+  rw [mul_sub, mul_sub]
+  rw [add_sub]
+  rw [add_comm]
+  rw [add_sub]
+  rw [add_comm]
+  rw [← add_sub]
+  rw [mul_comm b a]
+  rw [sub_self]
+  rw [add_zero]
+  rw [← pow_two, ← pow_two]
 
 #check pow_two a
 #check mul_sub a b c
