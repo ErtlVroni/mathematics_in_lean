@@ -114,33 +114,58 @@ example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) := by
 example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) :=
   add_le_add_left (exp_le_exp.mpr (add_le_add_left h₀ a)) c
 
-
-
-
-
-
-
 example : (0 : ℝ) < 1 := by
   norm_num
 
 example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
-  have h₀ : 0 < 1 + exp a := by sorry
+  have h₀ : 0 < 1 + exp a := by
+    have h₁ : (0 : ℝ) < 1 := by
+      norm_num
+    have h₂ : 0 < exp a :=
+      exp_pos a
+    apply add_pos h₁ h₂
+  have h₃ : 1 + exp a ≤ 1 + exp b := by
+    apply add_le_add_left (exp_le_exp.mpr h)
+  apply log_le_log h₀ h₃
+
+example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
+  have h₀ : 0 < 1 + exp a := by
+    linarith [exp_pos a]
   apply log_le_log h₀
-  sorry
+  apply add_le_add_left (exp_le_exp.mpr h)
+
+example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) := by
+  apply log_le_log
+  · linarith [exp_pos a]
+  · apply add_le_add_left (exp_le_exp.mpr h)
+
+
 
 example : 0 ≤ a ^ 2 := by
   -- apply?
   exact sq_nonneg a
 
+
 example (h : a ≤ b) : c - exp b ≤ c - exp a := by
-  sorry
+  apply tsub_le_tsub_left (exp_le_exp.mpr h)
+
+example (h : a ≤ b) : c - exp b ≤ c - exp a := by
+  linarith [exp_le_exp.mpr h]
+
+example (h : a ≤ b) : c - exp b ≤ c -exp a := by
+  have h₀ : - exp b ≤ - exp a := by
+    linarith [exp_le_exp.mpr h]
+  apply add_le_add_left h₀
+
+example (h : a ≤ b) : c - exp b ≤ c - exp a := by
+  apply sub_le_sub_left (exp_le_exp.mpr h)
+
 
 example : 2*a*b ≤ a^2 + b^2 := by
   have h : 0 ≤ a^2 - 2*a*b + b^2
   calc
     a^2 - 2*a*b + b^2 = (a - b)^2 := by ring
-    _ ≥ 0 := by apply pow_two_nonneg
-
+    _ ≥ 0 := by apply sq_nonneg
   calc
     2*a*b = 2*a*b + 0 := by ring
     _ ≤ 2*a*b + (a^2 - 2*a*b + b^2) := add_le_add (le_refl _) h
@@ -154,6 +179,42 @@ example : 2*a*b ≤ a^2 + b^2 := by
   linarith
 
 example : |a*b| ≤ (a^2 + b^2)/2 := by
-  sorry
+  have h₀ : 0 ≤ a^2 - 2*a*b + b^2
+  calc
+    a^2 - 2*a*b + b^2 = (a - b)^2 := by ring
+    _ ≥ 0 := by apply sq_nonneg
+  have h₁ : 2*a*b ≤ a^2 + b^2
+  calc
+    2*a*b = 2*a*b + 0 := by ring
+    _ ≤ 2*a*b + (a^2 - 2*a*b + b^2) := add_le_add (le_refl _) h₀
+    _ = (a^2 + b^2):= by ring
+  have h₂ : (a*b) ≤ (a^2 + b^2)/2 := by linarith [h₁]
+  have h₃ : 0 ≤ a^2 + 2*a*b + b^2
+  calc
+    a^2 + 2*a*b + b^2 = (a + b)^2 := by ring
+    _ ≥ 0 := by apply sq_nonneg
+  have h₄ : -2*a*b ≤ a^2 + b^2
+  calc
+    -2*a*b = -2*a*b + 0 := by ring
+    _ ≤ -2*a*b + (a^2 + 2*a*b + b^2) := add_le_add (le_refl _) h₃
+    _ = (a^2 + b^2):= by ring
+  have h₅ : -(a*b) ≤ (a^2 + b^2)/2 := by linarith [h₄]
+  apply abs_le'.mpr
+  constructor
+  · apply h₂
+  · apply h₅
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #check abs_le'.mpr
