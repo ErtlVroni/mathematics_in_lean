@@ -75,14 +75,6 @@ example : max a b = max b a := by
     · apply le_max_left
 
 
-example : min (min a b) c = min a (min b c) := by
-  apply le_antisymm
-  · show min (min a b) c ≤ min a (min b c)
-    have h₀ : min a b ≤ a := by apply min_le_left
-    have h₁ : min a b ≤ b := by apply min_le_right
-    apply max_le
-    · apply le_max_right
-    · apply le_max_left
 
 
 example : min (min a b) c = min a (min b c) := by
@@ -90,12 +82,6 @@ example : min (min a b) c = min a (min b c) := by
   · show min (min a b) c ≤ min a (min b c)
     have h₀ : min a b ≤ a := by apply min_le_left
     have h₁ : min a b ≤ b := by apply min_le_right
-    have h₂ : min (min a b) c ≤ (min a b) := by
-      apply min_le_left
-    have h₃ : min (min a b) c ≤ a := by
-      apply le_trans
-      · apply h₂
-      · apply h₀
     have h₂ : min (min a b) c ≤ (min a b) := by
       apply min_le_left
     have h₃ : min (min a b) c ≤ a := by
@@ -316,6 +302,8 @@ example : Nat.gcd m n = Nat.gcd n m := by
     have h₁' : Nat.gcd n m ∣ n := by
       apply Nat.gcd_dvd_left n m
     apply Nat.dvd_gcd h₀' h₁'
+
+
 
 example : Nat.gcd m n = Nat.gcd n m := by
   apply Nat.dvd_antisymm
