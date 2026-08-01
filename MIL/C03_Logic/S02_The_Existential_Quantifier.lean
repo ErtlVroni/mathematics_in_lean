@@ -9,6 +9,8 @@ example : ∃ x : ℝ, 2 < x ∧ x < 3 := by
   use 5 / 2
   norm_num
 
+#check ∃ x : ℝ, 2 < x ∧ x < 3
+
 example : ∃ x : ℝ, 2 < x ∧ x < 3 := by
   have h1 : 2 < (5 : ℝ) / 2 := by norm_num
   have h2 : (5 : ℝ) / 2 < 3 := by norm_num
