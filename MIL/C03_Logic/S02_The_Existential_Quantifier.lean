@@ -43,6 +43,14 @@ theorem fnUb_add {f g : ℝ → ℝ} {a b : ℝ} (hfa : FnUb f a) (hgb : FnUb g 
     FnUb (fun x ↦ f x + g x) (a + b) :=
   fun x ↦ add_le_add (hfa x) (hgb x)
 
+theorem fnLb_add {f g : ℝ → ℝ} {a b : ℝ} (hfa : FnLb f a) (hgb : FnLb g b) :
+    FnLb (fun x ↦ f x + g x) (a  + b) := by
+  intro x
+  dsimp
+  apply add_le_add
+  · apply hfa
+  · apply hgb
+
 section
 
 variable {f g : ℝ → ℝ}
@@ -54,10 +62,44 @@ example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x ↦ f x + g x := by
   apply fnUb_add ubfa ubgb
 
 example (lbf : FnHasLb f) (lbg : FnHasLb g) : FnHasLb fun x ↦ f x + g x := by
-  sorry
+  rcases lbf with ⟨a, lbfa : FnLb f a⟩
+  rcases lbg with ⟨b, lbgb : FnLb g b⟩
+  use a + b
+  apply fnLb_add lbfa lbgb
+
+example (lbf : FnHasLb f) (lbg : FnHasLb g) : FnHasLb fun x ↦ f x + g x := by
+  rcases lbf with ⟨a, lbfa : FnLb f a⟩
+  rcases lbg with ⟨b, lbgb : FnLb g b⟩
+  use a + b
+  apply fun x ↦ add_le_add (lbfa x) (lbgb x)
+
 
 example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
-  sorry
+  rcases ubf with ⟨a, ubfa : FnUb f a⟩
+  use c * a
+  apply fun x ↦ mul_le_mul_of_nonneg_left (ubfa x) h
+
+example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
+  rcases ubf with ⟨a, ubfa : FnUb f a⟩
+  use c * a
+  intro x
+  exact mul_le_mul_of_nonneg_left (ubfa x) h
+
+example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
+  rcases ubf with ⟨a, ubfa : FnUb f a⟩
+  use c * a
+  intro x
+  dsimp
+  apply mul_le_mul_of_nonneg_left
+  · apply (ubfa x)
+  · apply h
+
+example {c : ℝ} (ubf : FnHasUb f) (h : c ≥ 0) : FnHasUb fun x ↦ c * f x := by
+  obtain ⟨a, ubfa : FnUb f a⟩ := ubf
+  exact ⟨c * a, fun x ↦ mul_le_mul_of_nonneg_left (ubfa x) h⟩
+
+#check mul_le_mul_of_nonneg_left
+
 
 example : FnHasUb f → FnHasUb g → FnHasUb fun x ↦ f x + g x := by
   rintro ⟨a, ubfa⟩ ⟨b, ubgb⟩
