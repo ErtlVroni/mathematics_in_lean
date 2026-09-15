@@ -110,7 +110,7 @@ example : FnHasUb f → FnHasUb g → FnHasUb fun x ↦ f x + g x :=
 
 end
 
-example (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x ↦ f x + g x := by
+example {f g : ℝ → ℝ} (ubf : FnHasUb f) (ubg : FnHasUb g) : FnHasUb fun x ↦ f x + g x := by
   obtain ⟨a, ubfa⟩ := ubf
   obtain ⟨b, ubgb⟩ := ubg
   exact ⟨a + b, fnUb_add ubfa ubgb⟩
@@ -148,8 +148,8 @@ def SumOfSquares (x : α) :=
 
 theorem sumOfSquares_mul {x y : α} (sosx : SumOfSquares x) (sosy : SumOfSquares y) :
     SumOfSquares (x * y) := by
-  rcases sosx with ⟨a, b, xeq⟩
-  rcases sosy with ⟨c, d, yeq⟩
+  rcases sosx with ⟨a, b, xeq : x = a^2 + b^2⟩
+  rcases sosy with ⟨c, d, yeq : y = c^2 + d^2⟩
   rw [xeq, yeq]
   use a * c - b * d, a * d + b * c
   ring
@@ -161,20 +161,75 @@ theorem sumOfSquares_mul' {x y : α} (sosx : SumOfSquares x) (sosy : SumOfSquare
   use a * c - b * d, a * d + b * c
   ring
 
+theorem sumOfSquares_mul3 {x y : α} (sosx : SumOfSquares x) (sosy : SumOfSquares y) : SumOfSquares (x * y) := by
+  obtain ⟨a, b, xeq : x = a^2 + b^2⟩ := sosx
+  obtain ⟨c, d, yeq : y = c^2 + d^2⟩ := sosy
+  rw [xeq, yeq]
+  use a * c - b * d, a * d + b * c
+  ring
+
 end
 
 section
 variable {a b c : ℕ}
 
 example (divab : a ∣ b) (divbc : b ∣ c) : a ∣ c := by
-  rcases divab with ⟨d, beq⟩
-  rcases divbc with ⟨e, ceq⟩
+  rcases divab with ⟨d, beq : b = a * d⟩
+  rcases divbc with ⟨e, ceq : c = b * e⟩
   rw [ceq, beq]
-  use d * e; ring
+  use d * e;
+  ring
+
+example (divab : a ∣ b) (divbc : b ∣ c) : a ∣ c := by
+  rcases divab with ⟨d, rfl⟩
+  rcases divbc with ⟨e, rfl⟩
+  use d * e
+  ring
+
+
+example (divab : a ∣ b) (divbc : b ∣ c) : a ∣ c := by
+  rcases divab with ⟨d, beq : b = a * d⟩
+  rcases divbc with ⟨e, ceq : c = b * e⟩
+  rw [ceq, beq]
+  rw [mul_assoc]
+  use d * e
 
 example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
-  sorry
+  obtain ⟨d, beq : b = a * d⟩ := divab
+  obtain ⟨e, ceq : c = a * e⟩ := divac
+  rw [beq, ceq]
+  rw [← mul_add]
+  use (d + e)
 
+example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
+  rcases divab with ⟨d, beq : b = a * d⟩
+  rcases divac with ⟨e, ceq : c = a * e⟩
+  rw [beq, ceq]
+  rw [← mul_add]
+  use (d + e)
+
+example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
+  rcases divab with ⟨d, beq : b = a * d⟩
+  rcases divac with ⟨e, ceq : c = a * e⟩
+  rw [beq, ceq]
+  use (d + e)
+  ring
+
+example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
+  rcases divab with ⟨d, rfl⟩
+  rcases divac with ⟨e, rfl⟩
+  rw [← mul_add]
+  use (d + e)
+
+example (divab : a ∣ b) (divac : a ∣ c) : a ∣ b + c := by
+  obtain ⟨d, rfl⟩ := divab
+  obtain ⟨e, rfl⟩ := divac
+  use (d + e)
+  rw [← mul_add]
+
+
+#check add_mul
+#check mul_add
 end
 
 section
@@ -187,17 +242,41 @@ example {c : ℝ} : Surjective fun x ↦ x + c := by
   dsimp; ring
 
 example {c : ℝ} (h : c ≠ 0) : Surjective fun x ↦ c * x := by
-  sorry
+  intro (y : ℝ)
+  use y / c
+  dsimp
+  rw [mul_div_cancel₀ y h]
+
+example {c : ℝ} (h : c ≠ 0) : Surjective fun x ↦ c * x := by
+  intro (y : ℝ)
+  use y / c
+  dsimp
+  field_simp [h]
+
+
+
 
 example (x y : ℝ) (h : x - y ≠ 0) : (x ^ 2 - y ^ 2) / (x - y) = x + y := by
   field_simp [h]
   ring
 
 example {f : ℝ → ℝ} (h : Surjective f) : ∃ x, f x ^ 2 = 4 := by
-  rcases h 2 with ⟨x, hx⟩
+  rcases h 2 with ⟨x, hx : f x = 2⟩
   use x
   rw [hx]
   norm_num
+
+example {f : ℝ → ℝ} (h : Surjective f) : ∃ x, f x ^ 2 = 4 := by
+  rcases h 2 with ⟨x, hx : f x = 2⟩
+  use x
+  rw [hx]
+  ring
+
+example {f : ℝ → ℝ} (h : Surjective f) : ∃ x, f x ^ 2 = 4 := by
+  obtain ⟨a, ha : f a = -2⟩ :=  h (-2)
+  use a
+  rw [ha]
+  ring
 
 end
 
@@ -207,6 +286,20 @@ variable {α : Type*} {β : Type*} {γ : Type*}
 variable {g : β → γ} {f : α → β}
 
 example (surjg : Surjective g) (surjf : Surjective f) : Surjective fun x ↦ g (f x) := by
-  sorry
+  intro (c : γ)
+  rcases surjg c with ⟨b, gbc : g b = c⟩
+  rcases surjf b with ⟨a, fab : f a = b⟩
+  use a
+  dsimp
+  rw [fab, gbc]
+
+example (surjg : Surjective g) (surjf : Surjective f) : Surjective fun x ↦ g (f x) := by
+  intro (c : γ)
+  dsimp
+  rcases surjg c with ⟨b, rfl⟩
+  rcases surjf b with ⟨a, rfl⟩
+  use a
+
+
 
 end

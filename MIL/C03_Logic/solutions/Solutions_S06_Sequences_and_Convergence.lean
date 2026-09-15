@@ -100,10 +100,10 @@ theorem convergesTo_unique {s : ℕ → ℝ} {a b : ℝ}
   by_contra abne
   have : |a - b| > 0 := by
     apply lt_of_le_of_ne
-    · apply abs_nonneg
-    intro h''
-    apply abne
-    apply eq_of_abs_sub_eq_zero h''.symm
+    · apply abs_nonneg (a - b)
+    · intro (h'' : 0 = |a - b|)
+      apply abne
+      apply eq_of_abs_sub_eq_zero h''.symm
   let ε := |a - b| / 2
   have εpos : ε > 0 := by
     change |a - b| / 2 > 0
@@ -128,4 +128,3 @@ theorem convergesTo_unique {s : ℕ → ℝ} {a b : ℝ}
     _ = |a - b| := by norm_num [ε]
 
   exact lt_irrefl _ this
-
